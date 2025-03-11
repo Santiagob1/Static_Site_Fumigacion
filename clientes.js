@@ -1,12 +1,6 @@
 document.addEventListener("DOMContentLoaded", function () {
     const token = localStorage.getItem("token");
-    if (!token) {
-        window.location.href = "login.html";
-        return;
-    }
-
-    // Cargar nombre del usuario
-    document.getElementById("nombre-usuario").textContent = localStorage.getItem("usuario") || "Usuario";
+    if (!token) window.location.href = "login.html";
 
     function cargarClientes() {
         fetch("https://empresa-fumigacion-latest.onrender.com/api/v1/clientes", {
@@ -32,28 +26,24 @@ document.addEventListener("DOMContentLoaded", function () {
                 `;
                 tbody.appendChild(row);
             });
-        })
-        .catch(error => console.error("Error al cargar clientes:", error));
+        });
     }
 
-    // Redireccionar botones a sus respectivas páginas
-    document.getElementById("agregar-cliente").addEventListener("click", function () {
+    document.getElementById("cerrar-sesion").addEventListener("click", function () {
+        localStorage.removeItem("token");
+        window.location.href = "login.html";
+    });
+
+    document.getElementById("btn-agregar").addEventListener("click", function () {
         window.location.href = "agregar.html";
     });
 
-    document.getElementById("actualizar-cliente").addEventListener("click", function () {
+    document.getElementById("btn-actualizar").addEventListener("click", function () {
         window.location.href = "actualizar.html";
     });
 
-    document.getElementById("eliminar-cliente").addEventListener("click", function () {
+    document.getElementById("btn-eliminar").addEventListener("click", function () {
         window.location.href = "eliminar.html";
-    });
-
-    // Cerrar sesión
-    document.getElementById("cerrar-sesion").addEventListener("click", function () {
-        localStorage.removeItem("token");
-        localStorage.removeItem("usuario");
-        window.location.href = "login.html";
     });
 
     cargarClientes();
