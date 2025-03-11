@@ -23,6 +23,9 @@
 
     <script>
         const API_URL = "https://empresa-fumigacion-latest.onrender.com/api/v1";
+        
+        // Eliminar token almacenado al cargar la página
+        localStorage.removeItem("token");
 
         document.getElementById("login-form").addEventListener("submit", async function (event) {
             event.preventDefault();
