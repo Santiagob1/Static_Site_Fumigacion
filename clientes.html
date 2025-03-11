@@ -11,6 +11,7 @@
     <div id="crud-container">
         <h2>Gestión de Clientes</h2>
         <button id="logout">Cerrar Sesión</button>
+        <button id="add-client">➕ Agregar Cliente</button>
         <table id="clientes-table">
             <thead>
                 <tr>
@@ -33,16 +34,36 @@
         </table>
     </div>
 
+    <!-- Modal para Editar Cliente -->
+    <div id="edit-modal" class="modal hidden">
+        <div class="modal-content">
+            <h3>Editar Cliente</h3>
+            <form id="edit-form">
+                <input type="hidden" id="edit-id">
+                <input type="text" id="edit-nombre" required placeholder="Nombre">
+                <input type="text" id="edit-direccion" required placeholder="Dirección">
+                <input type="text" id="edit-telefono" required placeholder="Teléfono">
+                <input type="email" id="edit-correo" required placeholder="Correo">
+                <input type="number" id="edit-tarifa" required placeholder="Tarifa Inicial">
+                <input type="number" id="edit-mensualidad" required placeholder="Mensualidad">
+                <input type="text" id="edit-codigo" required placeholder="Código Postal">
+                <input type="text" id="edit-plagas" required placeholder="Plagas Encontradas">
+                <input type="text" id="edit-zona" required placeholder="Zona">
+                <button type="submit">Guardar Cambios</button>
+                <button type="button" id="close-edit">Cancelar</button>
+            </form>
+        </div>
+    </div>
+
     <script>
         const API_URL = "https://empresa-fumigacion-latest.onrender.com/api/v1";
+        const token = localStorage.getItem("token");
+
+        if (!token) {
+            window.location.href = "login.html"; 
+        }
 
         async function cargarClientes() {
-            const token = localStorage.getItem("token");
-            if (!token) {
-                window.location.href = "login.html"; // Redirige si no hay token
-                return;
-            }
-
             const response = await fetch(`${API_URL}/clientes/all`, {
                 method: "GET",
                 headers: { "Authorization": `Bearer ${token}` }
@@ -66,17 +87,53 @@
                         <td>${cliente.plagasEncontradas}</td>
                         <td>${cliente.zona}</td>
                         <td>
-                            <button class="edit-btn">✏️</button>
-                            <button class="delete-btn">🗑️</button>
+                            <button class="edit-btn" onclick="editarCliente(${cliente.id})">✏️</button>
+                            <button class="delete-btn" onclick="eliminarCliente(${cliente.id})">🗑️</button>
                         </td>
                     </tr>`;
                 tbody.innerHTML += row;
             });
         }
 
+        async function eliminarCliente(id) {
+            if (confirm("¿Estás seguro de eliminar este cliente?")) {
+                await fetch(`${API_URL}/clientes/${id}`, {
+                    method: "DELETE",
+                    headers: { "Authorization": `Bearer ${token}` }
+                });
+                cargarClientes();
+            }
+        }
+
+        function editarCliente(id) {
+            document.getElementById("edit-modal").classList.remove("hidden");
+
+            fetch(`${API_URL}/clientes/${id}`, {
+                method: "GET",
+                headers: { "Authorization": `Bearer ${token}` }
+            })
+            .then(response => response.json())
+            .then(cliente => {
+                document.getElementById("edit-id").value = cliente.id;
+                document.getElementById("edit-nombre").value = cliente.nombre;
+                document.getElementById("edit-direccion").value = cliente.direccion;
+                document.getElementById("edit-telefono").value = cliente.telefono;
+                document.getElementById("edit-correo").value = cliente.correo;
+                document.getElementById("edit-tarifa").value = cliente.tarifaInicial;
+                document.getElementById("edit-mensualidad").value = cliente.mensualidad;
+                document.getElementById("edit-codigo").value = cliente.codigoPostal;
+                document.getElementById("edit-plagas").value = cliente.plagasEncontradas;
+                document.getElementById("edit-zona").value = cliente.zona;
+            });
+        }
+
         document.getElementById("logout").addEventListener("click", function () {
             localStorage.removeItem("token");
             window.location.href = "login.html";
+        });
+
+        document.getElementById("close-edit").addEventListener("click", function () {
+            document.getElementById("edit-modal").classList.add("hidden");
         });
 
         cargarClientes();
