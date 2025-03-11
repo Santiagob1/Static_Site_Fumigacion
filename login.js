@@ -1,25 +1,26 @@
 document.addEventListener("DOMContentLoaded", function () {
-    localStorage.removeItem("token");
-    
-    document.getElementById("login-form").addEventListener("submit", async function (event) {
-        event.preventDefault();
-        
-        const correo = document.getElementById("correo").value;
-        const contrasena = document.getElementById("contrasena").value;
+    const loginForm = document.getElementById("login-form");
 
-        const response = await fetch("https://empresa-fumigacion-latest.onrender.com/api/v1/auth/loginAdmin", {
+    loginForm.addEventListener("submit", function (e) {
+        e.preventDefault();
+
+        const email = document.getElementById("email").value;
+        const password = document.getElementById("password").value;
+
+        fetch("https://empresa-fumigacion-latest.onrender.com/api/v1/auth/login", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ correo, contrasena })
-        });
-        
-        const data = await response.json();
-        
-        if (!data.error) {
-            localStorage.setItem("token", data.respuesta.token);
-            window.location.href = "clientes.html";
-        } else {
-            alert("Error en las credenciales");
-        }
+            body: JSON.stringify({ email, password })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.token) {
+                localStorage.setItem("token", data.token);
+                window.location.href = "clientes.html";
+            } else {
+                alert("Credenciales incorrectas");
+            }
+        })
+        .catch(() => alert("Error al iniciar sesión"));
     });
 });
