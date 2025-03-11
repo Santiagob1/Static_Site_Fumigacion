@@ -1,42 +1,39 @@
 body {
-    font-family: Arial, sans-serif;
     background-color: #f4f4f4;
     display: flex;
     justify-content: center;
     align-items: center;
     height: 100vh;
+    font-family: Arial, sans-serif;
 }
 
-.login-container {
-    background-color: #1e3a5f;
-    color: white;
-    padding: 25px;
+.container {
+    background-color: #1f3b64;
+    padding: 20px;
     border-radius: 10px;
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
-    width: 500px;  /* Igual a la lista de clientes */
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
     text-align: center;
-    position: relative;
-    display: flex;
-    flex-direction: column;
+    width: 350px;
+    color: white;
 }
 
 h2 {
     margin-bottom: 20px;
-    color: #333;
 }
 
 input {
     width: 100%;
     padding: 10px;
     margin: 10px 0;
-    border: 1px solid #ccc;
+    border: none;
     border-radius: 5px;
 }
 
 button {
     width: 100%;
     padding: 10px;
-    background: #1e3a5f;
+    margin-top: 10px;
+    background-color: #4caf50;
     color: white;
     border: none;
     border-radius: 5px;
@@ -44,5 +41,5 @@ button {
 }
 
 button:hover {
-    background: #1e3f6b;
+    background-color: #45a049;
 }
