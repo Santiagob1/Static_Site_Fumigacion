@@ -1,0 +1,123 @@
+/* Reset básico */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    background: linear-gradient(to right, #007bff, #00d4ff);
+    color: white;
+}
+
+.hidden {
+    display: none;
+}
+
+/* Estilo del login */
+#login-container {
+    background: white;
+    padding: 30px;
+    border-radius: 8px;
+    text-align: center;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+    color: black;
+}
+
+#login-container h2 {
+    margin-bottom: 20px;
+}
+
+#login-form {
+    display: flex;
+    flex-direction: column;
+}
+
+#login-form label {
+    font-weight: bold;
+    margin-bottom: 5px;
+    text-align: left;
+}
+
+#login-form input {
+    padding: 8px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+
+#login-form button {
+    padding: 10px;
+    background: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+#login-form button:hover {
+    background: #0056b3;
+}
+
+/* CRUD Container */
+#crud-container {
+    width: 90%;
+    max-width: 1200px;
+    text-align: center;
+}
+
+h2 {
+    margin-bottom: 20px;
+}
+
+#logout {
+    padding: 8px 15px;
+    background: red;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-bottom: 15px;
+}
+
+#clientes-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    color: black;
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+#clientes-table th, #clientes-table td {
+    padding: 10px;
+    border: 1px solid #ddd;
+    text-align: center;
+}
+
+#clientes-table th {
+    background: #007bff;
+    color: white;
+}
+
+.edit-btn {
+    background: orange;
+    border: none;
+    padding: 5px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.delete-btn {
+    background: red;
+    border: none;
+    padding: 5px;
+    border-radius: 5px;
+    cursor: pointer;
+}
