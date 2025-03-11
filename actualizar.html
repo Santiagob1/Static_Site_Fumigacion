@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Actualizar Cliente</title>
+    <link rel="stylesheet" href="formularios.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">Actualizar Cliente</div>
+        &nbsp;
+        <form id="form-actualizar">
+            <select id="cliente-select">
+                <option value="">Seleccione un cliente</option>
+            </select>
+            <div class="form-content">
+                <input type="hidden" id="id">
+                <input type="text" id="nombre" placeholder="Nombre" required>
+                <input type="text" id="direccion" placeholder="Dirección" required>
+                <input type="text" id="telefono" placeholder="Teléfono" required>
+                <input type="email" id="correo" placeholder="Correo" required>
+                <input type="number" id="tarifaInicial" placeholder="Tarifa Inicial" required>
+                <input type="number" id="mensualidad" placeholder="Mensualidad" required>
+                <input type="text" id="codigoPostal" placeholder="Código Postal" required>
+                <input type="text" id="plagasEncontradas" placeholder="Plagas Encontradas" required>
+                <input type="text" id="zona" placeholder="Zona" required>
+            </div>
+            <div class="button-container">
+                <button type="submit">Actualizar</button>
+                <button class="return-btn" onclick="window.location.href='clientes.html'">Volver</button>
+            </div>
+        </form>
+    </div>
+</body>
+</html>

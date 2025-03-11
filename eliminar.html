@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eliminar Cliente</title>
+    <link rel="stylesheet" href="formularios.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">Eliminar Cliente</div>
+        &nbsp;
+        <form id="form-eliminar">
+            <select id="cliente-select">
+                <option value="">Seleccione un cliente</option>
+            </select>
+            <div class="form-content">
+                <input type="hidden" id="id">
+                <input type="text" id="nombre" placeholder="Nombre" readonly>
+                <input type="text" id="direccion" placeholder="Dirección" readonly>
+                <input type="text" id="telefono" placeholder="Teléfono" readonly>
+                <input type="email" id="correo" placeholder="Correo" readonly>
+                <input type="number" id="tarifaInicial" placeholder="Tarifa Inicial" readonly>
+                <input type="number" id="mensualidad" placeholder="Mensualidad" readonly>
+                <input type="text" id="codigoPostal" placeholder="Código Postal" readonly>
+                <input type="text" id="plagasEncontradas" placeholder="Plagas Encontradas" readonly>
+                <input type="text" id="zona" placeholder="Zona" readonly>
+            </div>
+            <div class="button-container">
+                <button type="submit">Eliminar</button>
+                <button class="return-btn" onclick="window.location.href='clientes.html'">Volver</button>
+            </div>
+        </form>
+    </div>
+</body>
+</html>
