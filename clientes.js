@@ -5,12 +5,17 @@ document.addEventListener("DOMContentLoaded", function () {
         return;
     }
 
+    // Cargar nombre del usuario desde localStorage
+    document.getElementById("nombre-usuario").textContent = localStorage.getItem("usuario") || "Usuario";
+
     function cargarClientes() {
         fetch("https://empresa-fumigacion-latest.onrender.com/api/v1/clientes", {
             headers: { "Authorization": `Bearer ${token}` }
         })
         .then(res => {
-            if (!res.ok) throw new Error("Error al cargar clientes");
+            if (!res.ok) {
+                throw new Error("Error al obtener los clientes");
+            }
             return res.json();
         })
         .then(data => {
@@ -27,51 +32,37 @@ document.addEventListener("DOMContentLoaded", function () {
                     <td>${cliente.tarifaInicial}</td>
                     <td>${cliente.mensualidad}</td>
                     <td>${cliente.codigoPostal}</td>
-                    <td>${cliente.plagasEncontradas}</td>
+                    <td>${Array.isArray(cliente.plagasEncontradas) ? cliente.plagasEncontradas.join(", ") : cliente.plagasEncontradas}</td>
                     <td>${cliente.zona}</td>
                 `;
                 tbody.appendChild(row);
             });
         })
         .catch(error => {
-            console.error("Error:", error);
-            alert("No se pudieron cargar los clientes.");
+            console.error("Error al cargar clientes:", error);
+            alert("Hubo un error al cargar los clientes. Inténtalo de nuevo.");
         });
     }
 
-    // Mostrar nombre del usuario en la barra lateral
-    function cargarUsuario() {
-        fetch("https://empresa-fumigacion-latest.onrender.com/api/v1/auth/user", {
-            headers: { "Authorization": `Bearer ${token}` }
-        })
-        .then(res => res.json())
-        .then(data => {
-            document.getElementById("nombre-usuario").textContent = data.nombre || "Usuario";
-        })
-        .catch(() => {
-            document.getElementById("nombre-usuario").textContent = "Usuario Desconocido";
-        });
-    }
-
-    // Configurar botones de navegación
+    // Redireccionar botones a sus respectivas páginas
     document.getElementById("agregar-cliente").addEventListener("click", function () {
-        window.location.href = "agregar.html";
+        window.location.href = "agregar_cliente.html";
     });
 
     document.getElementById("actualizar-cliente").addEventListener("click", function () {
-        window.location.href = "actualizar.html";
+        window.location.href = "actualizar_cliente.html";
     });
 
     document.getElementById("eliminar-cliente").addEventListener("click", function () {
-        window.location.href = "eliminar.html";
+        window.location.href = "eliminar_cliente.html";
     });
 
+    // Botón de cerrar sesión
     document.getElementById("cerrar-sesion").addEventListener("click", function () {
         localStorage.removeItem("token");
+        localStorage.removeItem("usuario");
         window.location.href = "login.html";
     });
 
-    // Cargar clientes y usuario al inicio
     cargarClientes();
-    cargarUsuario();
 });
