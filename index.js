@@ -1,14 +1,20 @@
 document.addEventListener("DOMContentLoaded", function () {
-    localStorage.removeItem("token"); // Elimina cualquier sesión previa
-
     const loginForm = document.getElementById("login-form");
 
     loginForm.addEventListener("submit", function (e) {
         e.preventDefault();
 
-        const email = document.getElementById("email").value.trim();
-        const password = document.getElementById("password").value.trim();
-        const errorMsg = document.getElementById("error-message");
+        const email = document.getElementById("correo").value.trim();
+        const password = document.getElementById("contrasena").value.trim();
+
+        // Buscar si ya existe un mensaje de error y eliminarlo
+        let errorMsg = document.getElementById("error-message");
+        if (!errorMsg) {
+            errorMsg = document.createElement("p");
+            errorMsg.id = "error-message";
+            errorMsg.style.color = "red";
+            loginForm.appendChild(errorMsg);
+        }
 
         // Validación de campos vacíos
         if (!email || !password) {
@@ -30,7 +36,7 @@ document.addEventListener("DOMContentLoaded", function () {
             window.location.href = "clientes.html";
         })
         .catch(err => {
-            errorMsg.textContent = err.message || "Error al iniciar sesión";
+            errorMsg.textContent = err.message || "Error al iniciar sesión.";
         });
     });
 });
