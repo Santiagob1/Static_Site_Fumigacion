@@ -27,7 +27,7 @@ document.addEventListener("DOMContentLoaded", function () {
             const response = await fetch("https://empresa-fumigacion-latest.onrender.com/api/v1/auth/login", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ email, password })
+                body: JSON.stringify({ correo: email, contrasena: password })
             });
 
             const data = await response.json();
