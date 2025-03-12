@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", function () {
-    const token = localStorage.getItem("token");
+    const token = "Bearer " + localStorage.getItem("token");
     if (!token) {
         window.location.href = "login.html";
         return;
@@ -10,7 +10,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function cargarClientes() {
         fetch("https://empresa-fumigacion-latest.onrender.com/api/v1/clientes", {
-            headers: { "Authorization": `Bearer ${token}` }
+            headers: { "Authorization": token }
         })
         .then(res => {
             if (!res.ok) {
