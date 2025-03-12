@@ -1,5 +1,5 @@
-document.addEventListener("DOMContentLoaded", function () {
-    const token = "Bearer " + localStorage.getItem("token");
+document.addEventListener("DOMContentLoaded", async function () {
+    const token = localStorage.getItem("token");
     if (!token) {
         window.location.href = "login.html";
         return;
@@ -8,19 +8,32 @@ document.addEventListener("DOMContentLoaded", function () {
     // Cargar nombre del usuario desde localStorage
     document.getElementById("nombre-usuario").textContent = localStorage.getItem("usuario") || "Usuario";
 
-    function cargarClientes() {
-        fetch("https://empresa-fumigacion-latest.onrender.com/api/v1/clientes", {
-            headers: { "Authorization": token }
-        })
-        .then(res => {
-            if (!res.ok) {
-                throw new Error("Error al obtener los clientes");
+    async function cargarClientes() {
+        try {
+            console.log("Realizando solicitud a la API de clientes...");
+
+            const response = await fetch("https://empresa-fumigacion-latest.onrender.com/api/v1/clientes", {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": "Bearer " + token
+                }
+            });
+
+            console.log("Respuesta cruda del servidor:", response);
+
+            if (!response.ok) {
+                const errorText = await response.text(); // Captura la respuesta exacta del backend
+                console.error("Error al obtener clientes. Respuesta del backend:", errorText);
+                throw new Error("Error al obtener los clientes: " + errorText);
             }
-            return res.json();
-        })
-        .then(data => {
+
+            const data = await response.json();
+            console.log("Datos recibidos:", data);
+
             const tbody = document.getElementById("clientes-tbody");
             tbody.innerHTML = "";
+
             data.forEach(cliente => {
                 const row = document.createElement("tr");
                 row.innerHTML = `
@@ -37,11 +50,11 @@ document.addEventListener("DOMContentLoaded", function () {
                 `;
                 tbody.appendChild(row);
             });
-        })
-        .catch(error => {
-            console.error("Error al cargar clientes:", error);
-            alert("Hubo un error al cargar los clientes. Inténtalo de nuevo.");
-        });
+
+        } catch (error) {
+            console.error("Error en cargarClientes:", error);
+            alert("Hubo un error al cargar los clientes. Revisa la consola para más detalles.");
+        }
     }
 
     // Redireccionar botones a sus respectivas páginas
@@ -64,5 +77,5 @@ document.addEventListener("DOMContentLoaded", function () {
         window.location.href = "login.html";
     });
 
-    cargarClientes();
+    await cargarClientes();
 });
