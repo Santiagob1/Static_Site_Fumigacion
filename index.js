@@ -1,7 +1,7 @@
 document.addEventListener("DOMContentLoaded", function () {
     const loginForm = document.getElementById("login-form");
 
-    loginForm.addEventListener("submit", function (e) {
+    loginForm.addEventListener("submit", async function (e) {
         e.preventDefault();
 
         const email = document.getElementById("correo").value.trim();
@@ -15,6 +15,7 @@ document.addEventListener("DOMContentLoaded", function () {
             errorMsg.style.color = "red";
             loginForm.appendChild(errorMsg);
         }
+        errorMsg.textContent = ""; // Limpiar mensaje previo
 
         // Validación de campos vacíos
         if (!email || !password) {
@@ -22,21 +23,23 @@ document.addEventListener("DOMContentLoaded", function () {
             return;
         }
 
-        fetch("https://empresa-fumigacion-latest.onrender.com/api/v1/auth/login", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ email, password })
-        })
-        .then(res => {
-            if (!res.ok) throw new Error("Credenciales incorrectas");
-            return res.json();
-        })
-        .then(data => {
+        try {
+            const response = await fetch("https://empresa-fumigacion-latest.onrender.com/api/v1/auth/login", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email, password })
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.message || "Credenciales incorrectas");
+            }
+
             localStorage.setItem("token", data.token);
             window.location.href = "clientes.html";
-        })
-        .catch(err => {
+        } catch (err) {
             errorMsg.textContent = err.message || "Error al iniciar sesión.";
-        });
+        }
     });
 });
