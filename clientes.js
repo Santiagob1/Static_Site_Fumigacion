@@ -5,33 +5,47 @@ document.addEventListener("DOMContentLoaded", async function () {
         return;
     }
 
-    // Cargar nombre del usuario desde localStorage
-    document.getElementById("nombre-usuario").textContent = localStorage.getItem("usuario") || "Usuario";
+    const tbody = document.getElementById("clientes-tbody");
+    const btnAgregar = document.getElementById("agregar-cliente");
+    const btnActualizar = document.getElementById("actualizar-cliente");
+    const btnEliminar = document.getElementById("eliminar-cliente");
+    const btnCerrarSesion = document.getElementById("cerrar-sesion");
+
+    let clienteSeleccionado = null;
+
+    // Deshabilitar botones al inicio
+    btnActualizar.setAttribute("disabled", "true");
+    btnEliminar.setAttribute("disabled", "true");
+
+    btnAgregar.addEventListener("click", function () {
+        window.location.href = "agregar.html";
+    });
+
+    btnCerrarSesion.addEventListener("click", function () {
+        const confirmar = confirm("¿Estás seguro de que quieres cerrar sesión?");
+        if (confirmar) {
+            localStorage.removeItem("token");
+            window.location.href = "index.html";
+        }
+    });
 
     async function cargarClientes() {
         try {
-            console.log("Realizando solicitud a la API de clientes...");
-
-            const response = await fetch("https://empresa-fumigacion-latest.onrender.com/api/v1/clientes", {
+            const url = "https://empresa-fumigacion-latest.onrender.com/api/v1/clientes/all";
+            const requestOptions = {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
                     "Authorization": "Bearer " + token
                 }
-            });
+            };
 
-            console.log("Respuesta cruda del servidor:", response);
-
+            const response = await fetch(url, requestOptions);
             if (!response.ok) {
-                const errorText = await response.text(); // Captura la respuesta exacta del backend
-                console.error("Error al obtener clientes. Respuesta del backend:", errorText);
-                throw new Error("Error al obtener los clientes: " + errorText);
+                throw new Error("Error al obtener los clientes");
             }
 
             const data = await response.json();
-            console.log("Datos recibidos:", data);
-
-            const tbody = document.getElementById("clientes-tbody");
             tbody.innerHTML = "";
 
             data.forEach(cliente => {
@@ -48,33 +62,83 @@ document.addEventListener("DOMContentLoaded", async function () {
                     <td>${Array.isArray(cliente.plagasEncontradas) ? cliente.plagasEncontradas.join(", ") : cliente.plagasEncontradas}</td>
                     <td>${cliente.zona}</td>
                 `;
+
+                row.addEventListener("click", function () {
+                    seleccionarCliente(cliente, row);
+                });
+
                 tbody.appendChild(row);
             });
 
         } catch (error) {
-            console.error("Error en cargarClientes:", error);
-            alert("Hubo un error al cargar los clientes. Revisa la consola para más detalles.");
+            console.error("❌ Error en cargarClientes:", error);
+            alert("Hubo un error al cargar los clientes.");
         }
     }
 
-    // Redireccionar botones a sus respectivas páginas
-    document.getElementById("agregar-cliente").addEventListener("click", function () {
-        window.location.href = "agregar_cliente.html";
+    function seleccionarCliente(cliente, row) {
+        document.querySelectorAll("#clientes-tbody tr").forEach(tr => tr.classList.remove("seleccionado"));
+        row.classList.add("seleccionado");
+
+        clienteSeleccionado = cliente;
+        localStorage.setItem("clienteActualizar", JSON.stringify(cliente));
+
+        console.log("📥 Cliente seleccionado y guardado en LocalStorage:", cliente);
+
+        btnActualizar.removeAttribute("disabled");
+        btnEliminar.removeAttribute("disabled");
+    }
+
+    btnActualizar.addEventListener("click", function () {
+        if (!clienteSeleccionado) {
+            alert("Seleccione un cliente primero.");
+            return;
+        }
+        window.location.href = "actualizar.html";
     });
 
-    document.getElementById("actualizar-cliente").addEventListener("click", function () {
-        window.location.href = "actualizar_cliente.html";
-    });
-
-    document.getElementById("eliminar-cliente").addEventListener("click", function () {
-        window.location.href = "eliminar_cliente.html";
-    });
-
-    // Botón de cerrar sesión
-    document.getElementById("cerrar-sesion").addEventListener("click", function () {
-        localStorage.removeItem("token");
-        localStorage.removeItem("usuario");
-        window.location.href = "login.html";
+    btnEliminar.addEventListener("click", async function () {
+        if (!clienteSeleccionado) {
+            alert("Seleccione un cliente primero.");
+            return;
+        }
+    
+        const confirmacion = confirm(`¿Está seguro de que desea eliminar a ${clienteSeleccionado.nombre}?`);
+        if (!confirmacion) return;
+    
+        try {
+            const url = `https://empresa-fumigacion-latest.onrender.com/api/v1/clientes/delete/${clienteSeleccionado.id}`;
+            const requestOptions = {
+                method: "DELETE",
+                headers: {
+                    "Authorization": "Bearer " + token
+                }
+            };
+    
+            const response = await fetch(url, requestOptions);
+    
+            if (response.ok) { // ✅ Validamos que la respuesta sea exitosa (200-299)
+                alert("Cliente eliminado correctamente ✅");
+    
+                document.querySelectorAll("#clientes-tbody tr").forEach(row => {
+                    if (row.firstChild.textContent == clienteSeleccionado.id) {
+                        row.remove();
+                    }
+                });
+    
+                clienteSeleccionado = null;
+                btnActualizar.setAttribute("disabled", "true");
+                btnEliminar.setAttribute("disabled", "true");
+    
+            } else {
+                const errorMsg = await response.text();
+                throw new Error(`Error al eliminar el cliente: ${errorMsg}`);
+            }
+    
+        } catch (error) {
+            console.error("❌ Error al eliminar cliente:", error);
+            alert("Hubo un error al eliminar el cliente. Verifica que el servidor esté en línea.");
+        }
     });
 
     await cargarClientes();

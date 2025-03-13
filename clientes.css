@@ -96,3 +96,14 @@ th {
     background: #004080;
     color: white;
 }
+.selected {
+    background-color: #d1e7fd; /* Azul claro */
+}
+button:disabled {
+    background-color: gray;
+    cursor: not-allowed;
+}
+.seleccionado {
+    background-color: #ffcccb !important; /* Rojo claro para indicar selección */
+    font-weight: bold;
+}
