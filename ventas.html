@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Venta de Productos</title>
+  <link rel="stylesheet" href="ventas.css"/>
+  <style>
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 999;
+      left: 0; top: 0;
+      width: 100%; height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      justify-content: center;
+      align-items: center;
+    }
+    .modal-content {
+      background-color: #fff;
+      padding: 2rem;
+      border-radius: 10px;
+      width: 90%;
+      max-width: 500px;
+      text-align: center;
+    }
+    .modal-content h2 { margin-top: 0; }
+    .modal-content ul {
+      text-align: left;
+      padding-left: 0;
+      list-style: none;
+    }
+    .modal-buttons {
+      margin-top: 1rem;
+      display: flex;
+      justify-content: space-around;
+    }
+    .modal-buttons button {
+      padding: 0.5rem 1rem;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .btn-confirmar { background-color: green; color: white; }
+    .btn-cancelar { background-color: red; color: white; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Venta de Productos</h1>
+    <button onclick="window.location.href='clientes.html'">Volver a Clientes</button>
+  </header>
+
+  <div class="main-container">
+    <p id="cliente-nombre">Cliente: </p>
+
+    <section class="productos" id="productos-lista"></section>
+
+    <section class="resumen">
+      <h2>Resumen de Compra</h2>
+      <ul id="resumen-lista"></ul>
+      <p><strong>Total:</strong> $<span id="total-compra">0</span></p>
+      <button id="realizar-compra">Realizar Compra</button>
+    </section>
+  </div>
+
+  <!-- Modal de Factura -->
+  <div class="modal" id="modal-factura">
+    <div class="modal-content">
+      <h2>Factura</h2>
+      <ul id="modal-detalle"></ul>
+      <p><strong>Total:</strong> $<span id="modal-total">0</span></p>
+      <div class="modal-buttons">
+        <button class="btn-confirmar" onclick="confirmarFactura()">Confirmar</button>
+        <button class="btn-cancelar" onclick="cerrarModal()">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const productos = [
+      { nombre: 'Spray Insecticida', precio: 20000, descripcion: 'Spray contra plagas voladoras.', imagen: 'https://www.mantys.com.co/wp-content/uploads/2020/07/DEMAND-DUO-1000x1000ahora_c-1000x1000_c.jpg' },
+      { nombre: 'Gel Cucarachicida', precio: 15000, descripcion: 'Gel especial para cucarachas.', imagen: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTAFmXSgeIk4ltkK0F1BlNSVF0tYD-XOF4G8w&s' },
+      { nombre: 'Trampas para Ratas', precio: 18000, descripcion: 'Trampas reutilizables para ratas.', imagen: 'https://www.mantys.com.co/wp-content/uploads/2021/03/IMAGEN-MAXTRAP-M-30-1000x1000_c.jpeg' },
+      { nombre: 'Veneno para Hormigas', precio: 12000, descripcion: 'Granulado atrayente para hormigas.', imagen: 'https://www.mantys.com.co/wp-content/uploads/2020/11/BANDEJA-PORTACEBOS-2024-MANTYS-1000x1000_c.jpg' },
+      { nombre: 'Gel contra moscas', precio: 15000, descripcion: 'Gel especial para moscas.', imagen: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTAFmXSgeIk4ltkK0F1BlNSVF0tYD-XOF4G8w&s' },
+      { nombre: 'Spray para campos', precio: 20000, descripcion: 'Spray contra insectos en cultivos.', imagen: 'https://www.mantys.com.co/wp-content/uploads/2020/07/DEMAND-DUO-1000x1000ahora_c-1000x1000_c.jpg' },
+      { nombre: 'Fumigación SemiProfesional', precio: 80000, descripcion: 'Servicio completo de fumigación.', imagen: 'https://displacol.com/wp-content/uploads/2020/11/dentia-gas.jpg' },
+      { nombre: 'Fumigación Profesional', precio: 160000, descripcion: 'Servicio completo de fumigación con mantenimiento', imagen: 'https://displacol.com/wp-content/uploads/2022020/11/dentia-gas.jpg' }
+    ];
+
+    // Recuperar cliente desde localStorage
+    const cliente = JSON.parse(localStorage.getItem("clienteVenta"));
+
+    if (cliente) {
+      document.getElementById("cliente-nombre").textContent = `Cliente: ${cliente.nombre}`;
+    } else {
+      alert("No se encontró un cliente seleccionado.");
+      window.location.href = 'clientes.html'; // Redirige al listado de clientes
+    }
+
+    const container = document.getElementById("productos-lista");
+    const resumenLista = document.getElementById("resumen-lista");
+    const totalCompra = document.getElementById("total-compra");
+    const modal = document.getElementById("modal-factura");
+    const modalDetalle = document.getElementById("modal-detalle");
+    const modalTotal = document.getElementById("modal-total");
+    const factura = [];
+
+    productos.forEach((producto, index) => {
+      const card = document.createElement("div");
+      card.classList.add("producto-card");
+      card.innerHTML = `
+        <img src="${producto.imagen}" alt="${producto.nombre}">
+        <h3>${producto.nombre}</h3>
+        <p>${producto.descripcion}</p>
+        <p><strong>$${producto.precio}</strong></p>
+        <input type="number" min="0" placeholder="Cantidad" id="cantidad-${index}">
+        <button onclick="agregarAFactura(${index})">Agregar</button>
+      `;
+      container.appendChild(card);
+    });
+
+    function agregarAFactura(index) {
+      const cantidadInput = document.getElementById(`cantidad-${index}`);
+      const cantidad = parseInt(cantidadInput.value);
+      if (!cantidad || cantidad <= 0) return alert("Ingrese una cantidad válida.");
+
+      const producto = productos[index];
+      const subtotal = producto.precio * cantidad;
+      factura.push({ nombre: producto.nombre, cantidad, subtotal });
+      renderizarFactura();
+      cantidadInput.value = "";
+    }
+
+    function renderizarFactura() {
+      resumenLista.innerHTML = "";
+      let total = 0;
+      factura.forEach(item => {
+        total += item.subtotal;
+        const li = document.createElement("li");
+        li.textContent = `${item.cantidad} x ${item.nombre} = $${item.subtotal}`;
+        resumenLista.appendChild(li);
+      });
+      totalCompra.textContent = total;
+    }
+
+    document.getElementById("realizar-compra").addEventListener("click", () => {
+      if (factura.length === 0) return alert("No hay productos en la factura.");
+      mostrarModal();
+    });
+
+    function mostrarModal() {
+      modalDetalle.innerHTML = "";
+      // Agregar datos del cliente desde localStorage
+      const clienteInfo = document.createElement("li");
+      clienteInfo.innerHTML = `
+        <p><strong>Nombre:</strong> ${cliente.nombre}</p>
+        <p><strong>Dirección:</strong> ${cliente.direccion}</p>
+        <p><strong>Teléfono:</strong> ${cliente.telefono}</p>
+        <p><strong>Correo:</strong> ${cliente.correo}</p>
+        <hr>
+      `;
+      modalDetalle.appendChild(clienteInfo);
+
+      let total = 0;
+      factura.forEach(item => {
+        total += item.subtotal;
+        const li = document.createElement("li");
+        li.textContent = `${item.cantidad} x ${item.nombre} = $${item.subtotal}`;
+        modalDetalle.appendChild(li);
+      });
+      modalTotal.textContent = total;
+      modal.style.display = "flex";
+    }
+
+    function cerrarModal() {
+      modal.style.display = "none";
+    }
+
+    async function confirmarFactura() {
+  try {
+    // Obtener el token desde localStorage
+    const token = localStorage.getItem("token");
+
+    // Verificar si el token está presente
+    if (!token) {
+      alert("No se ha encontrado el token de autenticación.");
+      window.location.href = "login.html"; // Redirigir al login si no hay token
+      return;
+    }
+
+    // Obtener el teléfono del cliente desde el localStorage
+    const telefono = "+57" + cliente.telefono;
+
+    // Crear la lista de productos en el formato adecuado
+    const productos = factura.map(item => ({
+      nombre: item.nombre,
+      cantidad: item.cantidad,
+      subtotal: item.subtotal
+    }));
+
+    // Crear el cuerpo de la solicitud
+    const body = JSON.stringify({
+      telefono, // Reemplazar cliente por teléfono
+      productos, // Lista de productos
+      total: document.getElementById("modal-total").textContent // Total de la compra
+    });
+
+    const response = await fetch('https://empresa-fumigacion-latest.onrender.com/api/v1/clientes/sendFactura', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}` // Agregar el token en el encabezado
+      },
+      body: body
+    });
+
+    // Verificar si la respuesta tiene el tipo de contenido esperado
+    const contentType = response.headers.get("Content-Type");
+    if (contentType && contentType.includes("application/json")) {
+      const data = await response.json();
+      if (response.ok) {
+        alert("Factura enviada correctamente al celular del cliente.");
+        cerrarModal();
+        factura.length = 0;
+        renderizarFactura();
+        window.location.href = "clientes.html";
+      } else {
+        alert("Error al enviar la factura: " + data.message);
+        window.location.href = "clientes.html";
+      }
+    } else {
+      // Si la respuesta no es JSON, manejar el mensaje de error como texto
+      const errorMessage = await response.text();
+      alert(errorMessage);
+      window.location.href = "clientes.html";
+    }
+  } catch (error) {
+    console.error("Error al enviar la factura:", error);
+    alert("Hubo un problema al procesar la solicitud.");
+    window.location.href = "clientes.html";
+  }
+}
+
+  </script>
+</body>
+</html>
